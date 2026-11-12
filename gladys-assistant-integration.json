@@ -1,177 +1,229 @@
 {
   "manifest_version": 1,
-  "type": "device",
-  "name": "Demo Devices Template",
+  "type": "provider",
+  "name": "Groupe E Vario",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "Unofficial: Groupe E Vario dynamic tariff (Fribourg), per quarter hour, as energy contracts.",
+    "fr": "Non officiel : tarif dynamique Groupe E Vario (Fribourg), au quart d’heure, en contrats d’énergie."
   },
-  "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
-  "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "version": "0.1.0",
+  "docker_image": "ghcr.io/lm1lc3n7/gladys-groupe-e-vario:0.1.0",
+  "gladys_version": ">=5.3.0",
+  "cover_image": "https://raw.githubusercontent.com/LM1LC3N7/gladys-groupe-e-vario/main/cover.png",
+  "categories": ["energy"],
+  "countries": ["CH"],
+  "transports": ["cloud"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Groupe E Vario",
+        "fr": "Groupe E Vario"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "Unofficial, not affiliated with Groupe E. Vario is the optional dynamic tariff of Groupe E: a price for every quarter hour, published the day before at about 15:00. This integration reads the public Groupe E tariff API (no account, no key) and adds two energy contracts in Energy → Contracts: \"Groupe E Vario\" (the integrated price, energy and grid) and \"Groupe E Vario (grid)\" (the grid price plus the energy price you type). Gladys prices every half hour with the published quarter hours; a quarter hour not published stays without a cost until it is, never a guessed price. The prices also feed the calendars groupe-e-vario and groupe-e-vario-grid. Nothing to configure here. Source: Groupe E; your bill always prevails.",
+        "fr": "Non officiel, sans lien avec Groupe E. Vario est le tarif dynamique en option de Groupe E : un prix par quart d’heure, publié la veille vers 15 h. Cette intégration lit l’API publique des tarifs de Groupe E (sans compte ni clé) et ajoute deux contrats d’énergie dans Énergie → Contrats : « Groupe E Vario » (le prix intégré, énergie et réseau) et « Groupe E Vario (réseau) » (le prix réseau plus le prix de l’énergie que vous saisissez). Gladys tarife chaque demi-heure avec les quarts d’heure publiés ; un quart d’heure pas encore publié reste sans coût jusqu’à sa publication, jamais un prix deviné. Les prix alimentent aussi les calendriers groupe-e-vario et groupe-e-vario-grid. Rien à configurer ici. Source : Groupe E ; votre facture fait toujours foi."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
-        }
-      ]
-    },
-    {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
-      },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
-    },
-    {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
-      "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
-      },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
-    },
-    {
-      "key": "unit",
-      "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
-      "required": false,
-      "default": "celsius",
-      "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
-      ]
-    },
-    {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
-      "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
-      },
-      "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
-    }
-  ],
-  "actions": [
-    {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
-      "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ]
-    }
-  ],
-  "scene_triggers": [
-    {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
-      "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
-      },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
+          "url": "https://github.com/LM1LC3N7/gladys-groupe-e-vario/blob/main/docs/en.md",
+          "label": {
+            "en": "Guide (English)",
+            "fr": "Guide (anglais)"
+          }
         },
         {
-          "key": "target",
-          "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
-          "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
+          "url": "https://github.com/LM1LC3N7/gladys-groupe-e-vario/blob/main/docs/fr.md",
+          "label": {
+            "en": "Guide (French)",
+            "fr": "Guide (français)"
+          }
+        },
+        {
+          "url": "https://www.groupe-e.ch",
+          "label": {
+            "en": "Groupe E",
+            "fr": "Groupe E"
+          }
+        }
+      ]
+    }
+  ],
+  "energy_contracts": {
+    "templates": [
+      {
+        "key": "groupe-e-vario",
+        "name": {
+          "en": "Groupe E Vario (integrated price)",
+          "fr": "Groupe E Vario (prix intégré)"
+        },
+        "description": {
+          "en": "The Vario integrated price of each quarter hour (energy and grid) as Groupe E publishes it, plus your supplement per kWh, then VAT if you type it. Priced by the integration; a quarter hour not published yet stays without a cost.",
+          "fr": "Le prix intégré Vario de chaque quart d’heure (énergie et réseau) tel que Groupe E le publie, plus votre supplément au kWh, puis la TVA si vous la saisissez. Tarifé par l’intégration ; un quart d’heure pas encore publié reste sans coût."
+        },
+        "country": "CH",
+        "currency": "CHF",
+        "timezone": "Europe/Zurich",
+        "pricing_mode": "delegated",
+        "version": "2026-11-11",
+        "inputs": [
+          {
+            "key": "supplement_chf_kwh",
+            "type": "number",
+            "unit": "CHF/kWh",
+            "default": 0,
+            "label": {
+              "en": "Supplement per kWh",
+              "fr": "Supplément au kWh"
+            },
+            "description": {
+              "en": "Everything else billed per kWh and not in the Vario price (federal grid surcharge, municipal charges…), before VAT, 0 to 2 CHF.",
+              "fr": "Tout le reste facturé au kWh et absent du prix Vario (supplément réseau fédéral, taxes communales…), hors TVA, de 0 à 2 CHF."
+            }
+          },
+          {
+            "key": "vat_percent",
+            "type": "number",
+            "unit": "%",
+            "default": 0,
+            "label": {
+              "en": "VAT",
+              "fr": "TVA"
+            },
+            "description": {
+              "en": "Added to the whole price per kWh, 0 to 100 %. 0 keeps the prices as Groupe E publishes them (check on your bill whether they include VAT; 8.1 % in 2026).",
+              "fr": "Ajoutée au prix au kWh complet, de 0 à 100 %. 0 garde les prix tels que Groupe E les publie (vérifiez sur votre facture s’ils comprennent la TVA ; 8,1 % en 2026)."
+            }
+          },
+          {
+            "key": "fixed_chf_month",
+            "type": "number",
+            "unit": "CHF/month",
+            "default": 0,
+            "label": {
+              "en": "Fixed amount per month",
+              "fr": "Montant fixe par mois"
+            },
+            "description": {
+              "en": "Subscription, metering and other monthly charges, VAT included, 0 to 1000 CHF.",
+              "fr": "Abonnement, comptage et autres frais mensuels, TVA comprise, de 0 à 1000 CHF."
+            }
+          }
+        ],
+        "tariff": {
+          "tariff_version": 1,
+          "components": [
+            {
+              "key": "fixed",
+              "kind": "fixed",
+              "label": "Fixed",
+              "amount": "{{input:fixed_chf_month}}",
+              "per": "month"
+            }
           ]
         }
-      ],
-      "variables": [
-        {
-          "key": "target",
-          "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
-        }
-      ]
-    }
-  ],
-  "scene_actions": [
-    {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
       },
-      "timeout_seconds": 15,
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
+      {
+        "key": "groupe-e-vario-grid",
+        "name": {
+          "en": "Groupe E Vario (grid)",
+          "fr": "Groupe E Vario (réseau)"
+        },
+        "description": {
+          "en": "The Vario grid price of each quarter hour as Groupe E publishes it, plus the energy price and supplement you type, then VAT if you type it. Priced by the integration; a quarter hour not published yet stays without a cost.",
+          "fr": "Le prix réseau Vario de chaque quart d’heure tel que Groupe E le publie, plus le prix de l’énergie et le supplément que vous saisissez, puis la TVA si vous la saisissez. Tarifé par l’intégration ; un quart d’heure pas encore publié reste sans coût."
+        },
+        "country": "CH",
+        "currency": "CHF",
+        "timezone": "Europe/Zurich",
+        "pricing_mode": "delegated",
+        "version": "2026-11-11",
+        "inputs": [
+          {
+            "key": "energy_chf_kwh",
+            "type": "number",
+            "unit": "CHF/kWh",
+            "default": 0,
+            "label": {
+              "en": "Energy price per kWh",
+              "fr": "Prix de l’énergie au kWh"
+            },
+            "description": {
+              "en": "The energy part of your contract, before VAT, 0 to 2 CHF: added to the Vario grid price of each quarter hour.",
+              "fr": "La part énergie de votre contrat, hors TVA, de 0 à 2 CHF : ajoutée au prix réseau Vario de chaque quart d’heure."
+            }
+          },
+          {
+            "key": "supplement_chf_kwh",
+            "type": "number",
+            "unit": "CHF/kWh",
+            "default": 0,
+            "label": {
+              "en": "Supplement per kWh",
+              "fr": "Supplément au kWh"
+            },
+            "description": {
+              "en": "Everything else billed per kWh and not in the Vario price (federal grid surcharge, municipal charges…), before VAT, 0 to 2 CHF.",
+              "fr": "Tout le reste facturé au kWh et absent du prix Vario (supplément réseau fédéral, taxes communales…), hors TVA, de 0 à 2 CHF."
+            }
+          },
+          {
+            "key": "vat_percent",
+            "type": "number",
+            "unit": "%",
+            "default": 0,
+            "label": {
+              "en": "VAT",
+              "fr": "TVA"
+            },
+            "description": {
+              "en": "Added to the whole price per kWh, 0 to 100 %. 0 keeps the prices as Groupe E publishes them (check on your bill whether they include VAT; 8.1 % in 2026).",
+              "fr": "Ajoutée au prix au kWh complet, de 0 à 100 %. 0 garde les prix tels que Groupe E les publie (vérifiez sur votre facture s’ils comprennent la TVA ; 8,1 % en 2026)."
+            }
+          },
+          {
+            "key": "fixed_chf_month",
+            "type": "number",
+            "unit": "CHF/month",
+            "default": 0,
+            "label": {
+              "en": "Fixed amount per month",
+              "fr": "Montant fixe par mois"
+            },
+            "description": {
+              "en": "Subscription, metering and other monthly charges, VAT included, 0 to 1000 CHF.",
+              "fr": "Abonnement, comptage et autres frais mensuels, TVA comprise, de 0 à 1000 CHF."
+            }
+          }
+        ],
+        "tariff": {
+          "tariff_version": 1,
+          "components": [
+            {
+              "key": "fixed",
+              "kind": "fixed",
+              "label": "Fixed",
+              "amount": "{{input:fixed_chf_month}}",
+              "per": "month"
+            }
+          ]
         }
-      ],
-      "outputs": [
-        {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
-        }
-      ]
-    }
-  ],
-  "widgets": [
-    {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      }
+    ],
+    "calendars": [
+      {
+        "key": "groupe-e-vario",
+        "granularity": "fifteen_minutes",
+        "currency": "CHF",
+        "timezone": "Europe/Zurich"
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
-    }
-  ]
+      {
+        "key": "groupe-e-vario-grid",
+        "granularity": "fifteen_minutes",
+        "currency": "CHF",
+        "timezone": "Europe/Zurich"
+      }
+    ]
+  }
 }

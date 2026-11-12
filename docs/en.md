@@ -1,61 +1,135 @@
-# Demo Devices Template
+# Groupe E Vario for Gladys Assistant
 
-This is the user documentation of the integration. Gladys re-hosts this file
-and shows a permanent **Documentation** link to it in the Configuration screen
-(in the user's language, with English as the fallback) — it is when
-configuring that the user needs it most. Keep the short onboarding hints in
-the `section` blocks of the manifest `config_schema`; put the long
-step-by-step (screenshots, troubleshooting…) here.
+**Unofficial integration, not affiliated with Groupe E. Never tested with a real
+Gladys energy contract nor a real meter yet; the Groupe E API itself was read
+for real on 2026-11-11.**
 
-## What you get
+Vario is the optional dynamic tariff of Groupe E (canton of Fribourg and
+around): a different price for every quarter hour, published the day before at
+about 15:00, and a bill computed on the meter's quarter-hour readings.
 
-Six demo devices show up after installation: a weather station (real data
-from Open-Meteo), a switch, a dimmable light, a smart plug with power
-metering, a motion sensor and a camera.
+This integration adds two **energy contracts** and two **price calendars** to
+Gladys:
 
-## Configuration
+- **Groupe E Vario (integrated price)**: the Vario integrated price (energy and
+  grid) of each quarter hour;
+- **Groupe E Vario (grid)**: the Vario grid price of each quarter hour, plus the
+  energy price you type (when your energy is billed apart);
+- the calendars `groupe-e-vario` (integrated price) and `groupe-e-vario-grid`
+  (grid price), in CHF/kWh per quarter hour, that other contract templates can
+  read.
 
-1. Open the **Configuration** tab of the integration.
-2. Set the **latitude** and **longitude** the demo weather station should
-   observe (they default to Paris), and pick your temperature unit.
-   The **refresh interval** sets how often the weather station and the
-   plug's power are read: every 5 minutes by default, every minute at most.
-3. Save: the devices appear in the **Discovery** tab, ready to be added.
+## Source
 
-The **Prefer the local connection** toggle drives the demo plug: it reports
-the channel it actually uses as a badge (local or cloud), with an orange dot
-when it runs degraded (local refused, cloud fallback).
+The public tariff API of Groupe E, version 2:
+`https://api.tariffs.groupe-e.ch/v2/tariffs` (no account, no key). Groupe E
+retired the version 1 (it answers "410 Gone"); if the version 2 goes too, the
+status says so ("the API v2 is gone") and the integration needs an update.
+Groupe E publishes no terms of use for this API (none found on 2026-11-11): the
+integration spares it (see below) and names itself with its own User-Agent.
+Your bill always prevails.
 
-## Actions
+## Getting started
 
-- **Test the weather provider** — performs a live request to Open-Meteo and
-  shows the current temperature and humidity under the button.
-- **Identify a device** — pick one of your devices in the list and it will
-  signal itself (the demo light "blinks" in the logs).
+1. Install the integration (Gladys 5.3.0 or later, nothing to configure).
+2. In **Energy → Contracts**, create a "Groupe E Vario (integrated price)" or
+   "Groupe E Vario (grid)" contract on your main meter.
+3. Type, if needed:
+   - **Energy price per kWh** (grid template only), before VAT, 0 to 2 CHF;
+   - **Supplement per kWh**: what is billed per kWh and not in the Vario price
+     (federal grid surcharge, municipal charges…), before VAT, 0 to 2 CHF;
+   - **VAT**, 0 to 100 %, added to the whole price per kWh. 0 keeps the prices
+     as Groupe E publishes them: check on your bill whether they already include
+     VAT (8.1 % in 2026);
+   - **Fixed amount per month** (subscription, metering), VAT included, 0 to
+     1000 CHF, computed by Gladys.
 
-## Scenes
+An input out of these bounds is not priced (the status counts those contracts).
 
-The integration adds its own cards to the scene editor (Gladys 5.1 or
-later), under the **Integrations** category:
+## How each half hour is priced
 
-- **Motion detected** (trigger) — starts the scene when a demo motion sensor
-  sees something move. Optionally pick the sensor and what moved (person,
-  animal); left empty, any detection matches. The following actions can
-  read what moved with `{{triggerEvent.data.target}}`.
-- **Identify a device** (action) — makes the chosen device signal itself.
-  It returns whether the device could signal itself, so the following
-  actions can depend on it.
+Gladys sends half hours; Vario prices change every quarter hour. A half hour is
+priced as its two quarter hours, each with half of the energy (the Gladys
+convention for quarter-hour calendars):
 
-## Dashboard
+cost = (½ kWh × price of the 1st quarter + ½ kWh × price of the 2nd quarter +
+kWh × (energy typed + supplement)) × (1 + VAT).
 
-Add the **Demo status** widget to a dashboard: it shows the live
-temperature of the weather station and the power of the office plug, the
-connection the plug currently uses (orange when degraded) and the observed
-location. Its **Identify the light** button makes the demo light signal
-itself.
+- **A missing price is never guessed nor counted 0**: when a quarter hour is not
+  known yet, the Gladys request fails, the half hour stays without a cost, and
+  Gladys computes it again later (about every 30 minutes). The missing day is
+  asked from Groupe E in the background.
+- The price never depends on the network at pricing time: only the prices
+  already received are used; a retry of Gladys gets the same answer.
+- **Negative price**: Gladys refuses a negative cost for a delegated contract. A
+  half hour whose total would be negative is counted 0 and labelled "negative
+  price, counted 0". The current price is shown as it is.
+- The **current price** (dashboard widget, "current price" scene condition) is
+  the one of the current quarter hour, with the next one when published;
+  unknown, it is empty, never 0.
+- Clock changes: the spring day has 92 quarter hours, the autumn one 100; the
+  hour from 02:00 to 03:00 seen twice in October has its own prices.
 
-## Troubleshooting
+## When Groupe E is asked
 
-The integration logs everything it does: check the integration logs from the
-Gladys UI (or `docker logs` on the host) with `LOG_LEVEL=debug` for the full
-detail.
+- At the first start: the last 35 days, in windows of 7 days at most, one
+  request at a time.
+- Then: the next day, from 15:00 (Swiss time), then every 30 minutes until it
+  is complete; a complete day is never asked again.
+- A past day incomplete or empty (before the start of the API history, January
+  2026): asked again once a day at most.
+- A day a pricing request of Gladys did not find: asked a minute after the last
+  request at the earliest (later after a failure).
+- After a failure: tried again after 5, 15, 30 minutes, 1 h, then every
+  3 hours; a "429" follows its `Retry-After` (between 1 minute and 6 hours,
+  10 minutes without the header), kept in `/data`; a retired API (404/410) is
+  asked again every 6 hours. A failure stops the other windows until the next
+  attempt.
+- The time of each attempt is written to `/data` before the request: a restart
+  or a reconnection does not ask sooner.
+- Bounded answers: 30 seconds, 2 MB, 1000 quarter hours; a redirect is never
+  followed.
+
+## What an answer may not carry
+
+A quarter hour is kept only when its start and end are exact ISO instants
+15 minutes apart, on the quarter, and both of its prices numbers in `CHF_kWh`
+between −5 and 5 CHF. Another unit is never converted, a text or an empty value
+is never a 0, two different prices for one quarter hour: neither is believed.
+An answer never makes a price already received forgotten. A complete day is
+not asked again, so a later correction by Groupe E is not seen; a quarter hour
+received again with another price (a day asked again while incomplete) replaces
+the old one and is published again to the calendar, but the costs Gladys
+already computed are not computed again (Gladys does not offer it to a
+delegated contract).
+
+## Status
+
+The status of the integration tells: up to which day the prices are known, the
+time of the last Groupe E publication, the last check, the error of the last
+attempt and the time of the next one, a today or tomorrow not complete, a
+calendar refused, the contracts with an input out of bounds, a `/data` that
+cannot be read or written.
+
+## Calendars
+
+The keys `groupe-e-vario` and `groupe-e-vario-grid` name the tariff Groupe E
+publishes. If another integration declared them first, Gladys refuses this one's
+writes (the status says so); this integration's contracts keep working, they do
+not read the calendars. A calendar not fed (Gladys unreachable) is tried again
+at the next check or reconnection, without a new request to Groupe E.
+
+## Data kept
+
+`/data/groupe-e-vario-state.json`: the prices per day (400 days at most), the
+time of the attempts, the pause if any, what each calendar received. No secret,
+no personal data. A file that does not read is read again every 10 seconds
+without asking Groupe E anything, and never overwritten with an empty state.
+
+## Limits
+
+- Gladys cannot express a negative cost for a delegated contract: counted 0.
+- A correction by Groupe E of a day already complete is not seen, and Gladys
+  does not compute again the past costs of a delegated contract.
+- The "integrated" price is taken as Groupe E publishes it: what it includes
+  (VAT, levies) was not checked against a bill.

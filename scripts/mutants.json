@@ -1,0 +1,176 @@
+[
+  {
+    "name": "data: another unit accepted",
+    "file": "src/data.js",
+    "from": "item.unit === UNIT",
+    "to": "true"
+  },
+  {
+    "name": "data: a text price accepted",
+    "file": "src/data.js",
+    "from": "return typeof value === 'number' && Number.isFinite(value) && Math.abs(value) <= MAX_PRICE",
+    "to": "return Number.isFinite(Number(value)) && Math.abs(value) <= MAX_PRICE"
+  },
+  {
+    "name": "data: price bound removed",
+    "file": "src/data.js",
+    "from": "Number.isFinite(value) && Math.abs(value) <= MAX_PRICE\n    ? value",
+    "to": "Number.isFinite(value)\n    ? value"
+  },
+  {
+    "name": "data: end not checked",
+    "file": "src/data.js",
+    "from": "end !== start + QUARTER_HOUR || ",
+    "to": ""
+  },
+  {
+    "name": "data: conflicting quarters kept",
+    "file": "src/data.js",
+    "from": "for (const start of conflicts) quarters.delete(start);",
+    "to": ""
+  },
+  {
+    "name": "data: too many entries accepted",
+    "file": "src/data.js",
+    "from": "if (prices.length > MAX_ENTRIES) throw",
+    "to": "if (false) throw"
+  },
+  {
+    "name": "data: restored half-known quarter accepted",
+    "file": "src/data.js",
+    "from": "if ((record.integrated[k] === null) !== (record.grid[k] === null)) return undefined;",
+    "to": ""
+  },
+  {
+    "name": "tariff: missing price counted 0",
+    "file": "src/tariff.js",
+    "from": "missing.add(dayOf(q));\n        known = false;",
+    "to": "known = true;"
+  },
+  {
+    "name": "tariff: negative total sent",
+    "file": "src/tariff.js",
+    "from": "if (total < 0) {",
+    "to": "if (false) {"
+  },
+  {
+    "name": "tariff: one quarter only",
+    "file": "src/tariff.js",
+    "from": "for (const q of [t, t + QUARTER_HOUR]) {",
+    "to": "for (const q of [t, t]) {"
+  },
+  {
+    "name": "tariff: input bounds removed",
+    "file": "src/tariff.js",
+    "from": "value < min || value > max",
+    "to": "false"
+  },
+  {
+    "name": "tariff: VAT ignored",
+    "file": "src/tariff.js",
+    "from": "const vat = (vario + energy + supplement) * (inputs.vat / 100);",
+    "to": "const vat = 0;"
+  },
+  {
+    "name": "tariff: next price guessed",
+    "file": "src/tariff.js",
+    "from": "next_price: nextPrice === undefined ? null : nextPrice,",
+    "to": "next_price: nextPrice ?? price,"
+  },
+  {
+    "name": "app: tomorrow asked before 15:00",
+    "file": "src/app.js",
+    "from": "return now >= publicationTime(today) ? addDays(today, 1) : today;",
+    "to": "return addDays(today, 1);"
+  },
+  {
+    "name": "app: incomplete day asked at once",
+    "file": "src/app.js",
+    "from": "if (again > now) {",
+    "to": "if (false) {"
+  },
+  {
+    "name": "app: no minimum gap",
+    "file": "src/app.js",
+    "from": "let gap = MIN_GAP;",
+    "to": "let gap = 0;"
+  },
+  {
+    "name": "app: no back-off",
+    "file": "src/app.js",
+    "from": "else if (failures > 0) gap = this.interval(failures);",
+    "to": ""
+  },
+  {
+    "name": "app: 429 pause ignored",
+    "file": "src/app.js",
+    "from": "if (pausedUntil !== undefined && pausedUntil > due) due = pausedUntil;",
+    "to": ""
+  },
+  {
+    "name": "app: retired asked as often as a failure",
+    "file": "src/app.js",
+    "from": "if (this.lastError === 'retired') gap = RETIRED_RETRY;\n      else if",
+    "to": "if"
+  },
+  {
+    "name": "app: attempt not dated before the request",
+    "file": "src/app.js",
+    "from": "    this.meta.attemptAt = this.now();\n    await this.save();",
+    "to": "    await this.save();"
+  },
+  {
+    "name": "app: a failure goes on with the other windows",
+    "file": "src/app.js",
+    "from": "        failure = err;\n        break;",
+    "to": "        failure = err;"
+  },
+  {
+    "name": "app: an answer erases a held price",
+    "file": "src/app.js",
+    "from": "const source = fresh.integrated[k] === null ? held : fresh;",
+    "to": "const source = fresh;"
+  },
+  {
+    "name": "app: future attempt date trusted",
+    "file": "src/app.js",
+    "from": "value > 0 && value <= now",
+    "to": "value > 0"
+  },
+  {
+    "name": "app: pause of any length trusted",
+    "file": "src/app.js",
+    "from": "      data.pausedUntil > now &&\n      data.pausedUntil <= now + PAUSE_MAX",
+    "to": "      data.pausedUntil > now"
+  },
+  {
+    "name": "app: unreadable /data treated as empty",
+    "file": "src/app.js",
+    "from": "if (result.status === 'unreadable') {",
+    "to": "if (false) {"
+  },
+  {
+    "name": "app: calendar sent days not remembered",
+    "file": "src/app.js",
+    "from": "for (const { day, sig } of days) this.sent[kind][day] = sig;",
+    "to": ""
+  },
+  {
+    "name": "app: calendar 403 not told apart",
+    "file": "src/app.js",
+    "from": "issue: status === 403 ? 'refused' : 'error'",
+    "to": "issue: 'error'"
+  },
+  {
+    "name": "app: pricing lacks no fetch",
+    "file": "src/app.js",
+    "from": "if (err instanceof PricingError && err.days) this.want(err.days);",
+    "to": ""
+  },
+  {
+    "name": "app: stop leaves the timer",
+    "file": "src/app.js",
+    "from": "    this.running = false;\n    this.generation += 1;\n    this.clearTimers();",
+    "to": "    this.running = false;"
+  }
+]

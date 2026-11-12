@@ -12,47 +12,27 @@ the notes of the version's GitHub Release.
 
 ### Added
 
-- A working example of scene triggers, scene actions and dashboard widgets
-  (Gladys 5.1.0 or later).
-- `CHANGELOG.md`, rolled by the Release workflow.
-- A GitHub Release for every version, with its changelog section as notes: the
-  Gladys Supervision page links each version to the repository's releases.
-- CI runs the tests on Node 22 and 24, and builds the Docker image.
-- Dependabot keeps the npm dependencies and the GitHub Actions up to date.
-- `SECURITY.md` (how to report a vulnerability) and `CLAUDE.md` (project rules
-  for contributors and coding assistants).
-- Manifest tests: `version` matches `package.json`, `docker_image` is tagged
-  with it, descriptions hold 10 to 100 characters, placeholders are
-  multi-language objects.
-- The latitude and longitude fields show an example value as placeholder.
+- Two delegated energy contracts, "Groupe E Vario (integrated price)" and
+  "Groupe E Vario (grid)": every half hour priced as its two quarter hours
+  (Swiss time, clock changes included), a supplement per kWh, the energy price
+  (grid template) and VAT added as typed, a fixed amount per month computed by
+  Gladys. A quarter hour not published yet fails the request (no cost, Gladys
+  retries), never a zero; a negative total is counted 0 and labelled.
+- The current price and the next one for the dashboard and the scenes.
+- The calendars `groupe-e-vario` and `groupe-e-vario-grid` (15 minutes, CHF),
+  fed with the days not received yet, retried at the next check or
+  reconnection.
+- The public Groupe E tariff API v2: the last 35 days at the first start, then
+  the next day from 15:00 Swiss time, every 30 minutes until complete; a day a
+  pricing request lacks asked in the background; back-off, 429 pause and the
+  time of the attempt kept in `/data`; a retired API (404/410) said in the
+  status.
+- `THIRD_PARTY_NOTICES.md`, shipped in the image with `LICENSE`.
+- The manifest declares `countries: ["CH"]` (Switzerland only), so it needs
+  Gladys 5.3.0 or later.
 
 ### Changed
 
-- Node.js 22 or later is required (Node 20 is end-of-life).
-- Integration SDK 0.16.0. The tests now run against the fake Gladys of the
-  SDK, which refuses the payloads Gladys refuses. A device published with a
-  `poll_frequency` is now polled without `should_poll: true` on a recent
-  core (an explicit `should_poll: false` opts out); the template keeps the
-  field explicit for the older cores.
-- The refresh interval is one minute minimum, the fastest Gladys polls a
-  device. The plug's power is only sent when it changes, and every 30
-  minutes otherwise.
+- The CI jobs stop after 30 minutes (`timeout-minutes`).
 
-### Fixed
-
-- Gladys refused the devices of the Discovery tab: the weather station and
-  the plug declared their poll frequency in seconds instead of one of the
-  values Gladys accepts, and were never polled. They now poll every minute,
-  and the readings follow the refresh interval of the configuration.
-
-- The release commit no longer fails `npm run format:check`: the Release
-  workflow updates the manifest `version` and `docker_image` in place instead
-  of re-printing the whole file with `jq`.
-- The integration can write to `/data`: the image creates the directory owned
-  by the `node` user, a new Docker volume was owned by root.
-- A sub-container running the integration's own image follows it to the new
-  tag at each release, as well as in the manifest of the build summary: it kept
-  the previous tag, which may not exist on the registry. Sub-containers on a
-  third-party image (a broker, a database...) keep theirs.
-
-[Unreleased]: https://github.com/GladysAssistant/integration-template-js/commits/main
+[Unreleased]: https://github.com/LM1LC3N7/gladys-groupe-e-vario/commits/main

@@ -1,8 +1,8 @@
 {
-  "name": "gladys-integration-template-js",
-  "version": "1.0.0",
+  "name": "gladys-groupe-e-vario",
+  "version": "0.1.0",
   "private": true,
-  "description": "Official starter template to build an external integration for Gladys Assistant with the JavaScript SDK.",
+  "description": "Groupe E Vario dynamic electricity tariff (Fribourg, Switzerland) per quarter hour as delegated energy contracts and tariff calendars for Gladys Assistant, from the public Groupe E tariff API. Unofficial.",
   "type": "module",
   "main": "index.js",
   "scripts": {
@@ -10,10 +10,17 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "node --test"
+    "test": "node --test --test-timeout=60000",
+    "audit": "npm audit --omit=dev",
+    "cover": "node scripts/cover.mjs cover.png",
+    "mutants": "node scripts/mutants.mjs"
   },
   "engines": {
     "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LM1LC3N7/gladys-groupe-e-vario.git"
   },
   "dependencies": {
     "@gladysassistant/integration-sdk": "^0.16.0"
