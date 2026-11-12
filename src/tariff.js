@@ -18,6 +18,7 @@ import {
   INPUT_BOUNDS,
   INPUT_DEFAULTS,
   INPUTS,
+  MAX_COST_PER_KWH,
   MAX_INTERVALS,
   TEMPLATES,
   TEMPLATE_INPUTS,
@@ -116,6 +117,11 @@ export function intervalCosts(days, contract, intervals) {
     const supplement = kwh * inputs.supplement;
     const vat = (vario + energy + supplement) * (inputs.vat / 100);
     const total = vario + energy + supplement + vat;
+    if (total > kwh * MAX_COST_PER_KWH) {
+      throw new PricingError(
+        `The price of the contract exceeds ${MAX_COST_PER_KWH} CHF/kWh (the Gladys limit): check its inputs`,
+      );
+    }
     if (total < 0) {
       costs.push({
         starts_at: interval.starts_at,

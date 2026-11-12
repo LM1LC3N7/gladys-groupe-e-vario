@@ -40,13 +40,15 @@ bas) et s'annonce par son propre User-Agent. Votre facture fait toujours foi.
      2 CHF ;
    - **Supplément au kWh** : ce qui est facturé au kWh et absent du prix Vario
      (supplément réseau fédéral, taxes communales…), hors TVA, de 0 à 2 CHF ;
-   - **TVA**, de 0 à 100 %, ajoutée au prix au kWh complet. 0 garde les prix
+   - **TVA**, de 0 à 25 %, ajoutée au prix au kWh complet. 0 garde les prix
      tels que Groupe E les publie : vérifiez sur votre facture s'ils comprennent
      déjà la TVA (8,1 % en 2026) ;
    - **Montant fixe par mois** (abonnement, comptage), TVA comprise, de 0 à
      1000 CHF, calculé par Gladys.
 
-Une saisie hors de ces bornes n'est pas tarifée (le statut compte ces contrats).
+Une saisie hors de ces bornes n'est pas tarifée (le statut compte ces contrats),
+ni une demi-heure qui coûterait plus de 10 CHF par kWh, la limite de Gladys (la
+demande échoue avec ce motif).
 
 ## Comment chaque demi-heure est tarifée
 
@@ -60,7 +62,12 @@ saisie + supplément)) × (1 + TVA).
 - **Un prix manquant n'est jamais deviné ni compté 0** : si un quart d'heure
   n'est pas encore connu, la demande de Gladys échoue, la demi-heure reste sans
   coût, et Gladys la recalcule plus tard (toutes les 30 minutes environ). Le
-  jour manquant est demandé à Groupe E en arrière-plan.
+  jour manquant est demandé à Groupe E en arrière-plan. Gladys rattrape un
+  contrat délégué depuis sa plus ancienne demi-heure sans coût (31 jours au plus
+  par passage) : un quart d'heure que Groupe E ne publie jamais (ou illisible)
+  bloque le rattrapage de toute cette fenêtre jusqu'à ce qu'il sorte des
+  31 jours. Une limite du moteur de Gladys, qui ne sait pas laisser un
+  intervalle sans coût et tarifer les autres.
 - Le prix ne dépend jamais du réseau au moment du calcul : seuls les prix déjà
   reçus servent ; une nouvelle tentative de Gladys donne le même résultat.
 - **Prix négatif** : Gladys refuse un coût négatif pour un contrat délégué. Une

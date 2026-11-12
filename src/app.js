@@ -402,12 +402,13 @@ export class App {
         return;
       }
       at = due;
+      // The time shown in the status: the real next attempt, not the wake-up.
+      this.retryAt = due;
     }
     this.sleep(gen, Math.min(Math.max(0, at - now), MAX_SLEEP));
   }
 
   sleep(gen, ms) {
-    this.retryAt = this.now() + ms;
     this.timer = this.timers.setTimeout(() => {
       this.timer = undefined;
       this.tick(gen);
@@ -513,6 +514,7 @@ export class App {
     // the time of this attempt, on a timer: a check never chains into the next
     // one without going through the schedule.
     this.checking = undefined;
+    this.retryAt = this.dueAt(now);
     this.sleep(gen, 0);
     this.publishStatus();
     if (changed || Object.keys(this.calendarIssue).length > 0) await this.publishCalendars(gen);

@@ -38,13 +38,15 @@ Your bill always prevails.
    - **Energy price per kWh** (grid template only), before VAT, 0 to 2 CHF;
    - **Supplement per kWh**: what is billed per kWh and not in the Vario price
      (federal grid surcharge, municipal charges…), before VAT, 0 to 2 CHF;
-   - **VAT**, 0 to 100 %, added to the whole price per kWh. 0 keeps the prices
+   - **VAT**, 0 to 25 %, added to the whole price per kWh. 0 keeps the prices
      as Groupe E publishes them: check on your bill whether they already include
      VAT (8.1 % in 2026);
    - **Fixed amount per month** (subscription, metering), VAT included, 0 to
      1000 CHF, computed by Gladys.
 
-An input out of these bounds is not priced (the status counts those contracts).
+An input out of these bounds is not priced (the status counts those contracts),
+nor a half hour that would cost more than 10 CHF per kWh, the Gladys limit (the
+request fails with that reason).
 
 ## How each half hour is priced
 
@@ -58,7 +60,11 @@ kWh × (energy typed + supplement)) × (1 + VAT).
 - **A missing price is never guessed nor counted 0**: when a quarter hour is not
   known yet, the Gladys request fails, the half hour stays without a cost, and
   Gladys computes it again later (about every 30 minutes). The missing day is
-  asked from Groupe E in the background.
+  asked from Groupe E in the background. Gladys catches up a delegated contract
+  from its oldest half hour without a cost (31 days at most per run): a quarter
+  hour Groupe E never publishes (or that does not read) holds the catch-up of
+  that whole window back until it leaves the 31 days. A limit of the Gladys
+  engine, which cannot leave one interval without a cost and price the others.
 - The price never depends on the network at pricing time: only the prices
   already received are used; a retry of Gladys gets the same answer.
 - **Negative price**: Gladys refuses a negative cost for a delegated contract. A

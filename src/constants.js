@@ -52,7 +52,7 @@ export const INPUT_DEFAULTS = {
 export const INPUT_BOUNDS = {
   [INPUTS.ENERGY]: [0, 2],
   [INPUTS.SUPPLEMENT]: [0, 2],
-  [INPUTS.VAT]: [0, 100],
+  [INPUTS.VAT]: [0, 25],
   [INPUTS.FIXED]: [0, 1000],
 };
 /** The inputs of each template, in the manifest order. */
@@ -80,6 +80,11 @@ export const BACKFILL_DAYS = 35;
 export const MAX_WANTED_DAYS = 62;
 /** The /data state file read back at most this size (larger: not ours). */
 export const MAX_STATE_BYTES = 8 * 1024 * 1024;
+/**
+ * The core refuses a cost above 10 CHF per kWh (a hostile-payload guard): a
+ * contract whose inputs would get there is refused by the module with a reason.
+ */
+export const MAX_COST_PER_KWH = 10;
 /** Intervals in one pricing request (the core sends 1,488 at most). */
 export const MAX_INTERVALS = 2000;
 /** Entries in one calendar publication (the core takes 2,000 at most). */

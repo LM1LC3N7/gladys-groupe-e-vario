@@ -60,7 +60,8 @@
   An answer never erases a price held; a changed price replaces it.
 - **Negative total counted 0** (the core refuses a negative cost), labelled.
 - **Inputs**: energy price (grid template) and supplement 0-2 CHF/kWh before
-  VAT, VAT 0-100 % on the whole (0 by default: unknown whether the published
+  VAT, VAT 0-25 % on the whole (with the energy and supplement bounds, a price could
+  still pass the core limit of 10 CHF/kWh: such a half hour is refused with a reason) (0 by default: unknown whether the published
   price includes it), fixed 0-1000 CHF/month (a `fixed` component the core
   computes). Checked by the module; an empty input takes its default.
 - **No configuration, no button**: the inputs belong to the contract.

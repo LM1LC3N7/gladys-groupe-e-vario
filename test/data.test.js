@@ -214,6 +214,27 @@ test('the pricing request is checked: start, energy, size', () => {
       JSON.stringify(bad),
     );
   }
+  // Inputs at their bounds on a dear published price: over the 10 CHF/kWh of the core, refused with a reason.
+  const dear = new Map([
+    [day, restoreDay(day, { integrated: Array(96).fill(5), grid: Array(96).fill(5) })],
+  ]);
+  const maxed = {
+    template_key: 'groupe-e-vario-grid',
+    inputs: { energy_chf_kwh: 2, supplement_chf_kwh: 2, vat_percent: 25 },
+  };
+  assert.throws(
+    () => intervalCosts(dear, maxed, [{ starts_at: t, kwh: 1 }]),
+    /exceeds 10 CHF\/kWh/,
+  );
+  const fine = {
+    template_key: 'groupe-e-vario-grid',
+    inputs: { energy_chf_kwh: 2, supplement_chf_kwh: 2 },
+  };
+  close(intervalCosts(dear, fine, [{ starts_at: t, kwh: 1 }])[0].cost, 9);
+  assert.throws(
+    () => contractInputs({ template_key: 'groupe-e-vario', inputs: { vat_percent: 81 } }),
+    /from 0 to 25/,
+  );
   assert.throws(
     () => intervalCosts(days, contract, Array(2001).fill({ starts_at: t, kwh: 1 })),
     /Invalid pricing request/,

@@ -172,5 +172,125 @@
     "file": "src/app.js",
     "from": "    this.running = false;\n    this.generation += 1;\n    this.clearTimers();",
     "to": "    this.running = false;"
+  },
+  {
+    "name": "R http: 404/410 not retired",
+    "file": "src/http.js",
+    "from": "if (status === 404 || status === 410) {",
+    "to": "if (false) {"
+  },
+  {
+    "name": "R http: 410 not retired",
+    "file": "src/http.js",
+    "from": "status === 404 || status === 410",
+    "to": "status === 404"
+  },
+  {
+    "name": "R http: 429 not rate_limited",
+    "file": "src/http.js",
+    "from": "if (status === 429) {",
+    "to": "if (false) {"
+  },
+  {
+    "name": "R http: Retry-After ignored",
+    "file": "src/http.js",
+    "from": "retryAfter: retryAfterMs(",
+    "to": "retryAfter: undefined && retryAfterMs("
+  },
+  {
+    "name": "R http: streamed body bound removed",
+    "file": "src/http.js",
+    "from": "if (size > limit) {",
+    "to": "if (false) {"
+  },
+  {
+    "name": "R http: content-length bound removed",
+    "file": "src/http.js",
+    "from": "if (Number.isFinite(declared) && declared > limit) {",
+    "to": "if (false) {"
+  },
+  {
+    "name": "R app: pause max not clamped",
+    "file": "src/app.js",
+    "from": "Math.min(Math.max(failure.retryAfter ?? PAUSE_DEFAULT, PAUSE_MIN), PAUSE_MAX)",
+    "to": "Math.max(failure.retryAfter ?? PAUSE_DEFAULT, PAUSE_MIN)"
+  },
+  {
+    "name": "R app: publication hour not corrected on clock-change days",
+    "file": "src/app.js",
+    "from": "t += (PUBLICATION_HOUR - zurich(t).hour) * HOUR;",
+    "to": ""
+  },
+  {
+    "name": "R time: every day 96 quarters",
+    "file": "src/time.js",
+    "from": "export const quartersOf = (day) => (dayStart(addDays(day, 1)) - dayStart(day)) / QUARTER_HOUR;",
+    "to": "export const quartersOf = (day) => 96;"
+  },
+  {
+    "name": "R data: start off the quarter accepted",
+    "file": "src/data.js",
+    "from": " || start % QUARTER_HOUR !== 0",
+    "to": ""
+  },
+  {
+    "name": "R tariff: negative label dropped",
+    "file": "src/tariff.js",
+    "from": "label: `${LABELS[inputs.kind]} (negative price, counted 0)`,",
+    "to": "label: LABELS[inputs.kind],"
+  },
+  {
+    "name": "R constants: VAT default 8.1",
+    "file": "src/constants.js",
+    "from": "[INPUTS.VAT]: 0,\n  [INPUTS.FIXED]: 0,",
+    "to": "[INPUTS.VAT]: 8.1,\n  [INPUTS.FIXED]: 0,"
+  },
+  {
+    "name": "R app: complete day asked again",
+    "file": "src/app.js",
+    "from": "if (this.complete(day)) continue;",
+    "to": ""
+  },
+  {
+    "name": "R app: past incomplete day every 30 min",
+    "file": "src/app.js",
+    "from": "day >= today ? WAIT_PUBLICATION : EMPTY_RETRY",
+    "to": "WAIT_PUBLICATION"
+  },
+  {
+    "name": "R app: wanted days not capped",
+    "file": "src/app.js",
+    "from": ".slice(0, MAX_WANTED_DAYS)",
+    "to": ""
+  },
+  {
+    "name": "R tariff: negative kWh accepted",
+    "file": "src/tariff.js",
+    "from": "kwh < 0",
+    "to": "false"
+  },
+  {
+    "name": "R app: failures not counted",
+    "file": "src/app.js",
+    "from": "this.meta.failures += 1;",
+    "to": ""
+  },
+  {
+    "name": "R app: retired gap 1 min",
+    "file": "src/constants.js",
+    "from": "export const RETIRED_RETRY = 6 * 60 * 60_000;",
+    "to": "export const RETIRED_RETRY = 60_000;"
+  },
+  {
+    "name": "tariff: price above the core limit sent",
+    "file": "src/tariff.js",
+    "from": "if (total > kwh * MAX_COST_PER_KWH) {",
+    "to": "if (false) {"
+  },
+  {
+    "name": "app: status shows the wake-up, not the next attempt",
+    "file": "src/app.js",
+    "from": "    this.retryAt = this.dueAt(now);\n",
+    "to": ""
   }
 ]

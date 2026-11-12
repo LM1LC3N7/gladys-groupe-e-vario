@@ -92,8 +92,8 @@
               "fr": "TVA"
             },
             "description": {
-              "en": "Added to the whole price per kWh, 0 to 100 %. 0 keeps the prices as Groupe E publishes them (check on your bill whether they include VAT; 8.1 % in 2026).",
-              "fr": "Ajoutée au prix au kWh complet, de 0 à 100 %. 0 garde les prix tels que Groupe E les publie (vérifiez sur votre facture s’ils comprennent la TVA ; 8,1 % en 2026)."
+              "en": "Added to the whole price per kWh, 0 to 25 %. 0 keeps the prices as Groupe E publishes them (check on your bill whether they include VAT; 8.1 % in 2026).",
+              "fr": "Ajoutée au prix au kWh complet, de 0 à 25 %. 0 garde les prix tels que Groupe E les publie (vérifiez sur votre facture s’ils comprennent la TVA ; 8,1 % en 2026)."
             }
           },
           {
@@ -178,8 +178,8 @@
               "fr": "TVA"
             },
             "description": {
-              "en": "Added to the whole price per kWh, 0 to 100 %. 0 keeps the prices as Groupe E publishes them (check on your bill whether they include VAT; 8.1 % in 2026).",
-              "fr": "Ajoutée au prix au kWh complet, de 0 à 100 %. 0 garde les prix tels que Groupe E les publie (vérifiez sur votre facture s’ils comprennent la TVA ; 8,1 % en 2026)."
+              "en": "Added to the whole price per kWh, 0 to 25 %. 0 keeps the prices as Groupe E publishes them (check on your bill whether they include VAT; 8.1 % in 2026).",
+              "fr": "Ajoutée au prix au kWh complet, de 0 à 25 %. 0 garde les prix tels que Groupe E les publie (vérifiez sur votre facture s’ils comprennent la TVA ; 8,1 % en 2026)."
             }
           },
           {

@@ -185,6 +185,71 @@ test('a 429 longer than the back-off: no request before its end', async () => {
   assert.equal(source.count(), before + 2);
 });
 
+test('a 429 with a huge Retry-After: paused 6 hours at most, the status gives its end', async () => {
+  let limited = false;
+  const { source, wait, gladys, app, store } = await setup({
+    handler: () => (limited ? json({}, 429, { 'retry-after': '99999999' }) : undefined),
+  });
+  limited = true;
+  const before = source.count();
+  await wait(TO_15H);
+  assert.equal(source.count(), before + 1);
+  assert.equal(
+    Math.round(store.data.pausedUntil - store.data.attemptAt),
+    6 * HOUR,
+    'capped at 6 hours',
+  );
+  // 15:00 + 6 h = 21:00 Swiss time: the status says so, not the one-hour wake-up.
+  assert.match(status(gladys).message.en, /next one about 2026-11-11 21:00/);
+  limited = false;
+  await wait(6 * HOUR - MINUTE);
+  assert.equal(source.count(), before + 1, 'nothing during the pause');
+  await wait(2 * MINUTE);
+  assert.equal(source.count(), before + 2);
+  assert.equal(app.lastError, undefined);
+});
+
+test('the status gives the real next attempt after a 404 (6 hours later)', async () => {
+  let gone = false;
+  const { wait, gladys } = await setup({
+    handler: () => (gone ? new Response('nope', { status: 404 }) : undefined),
+  });
+  gone = true;
+  await wait(TO_15H);
+  assert.match(status(gladys).message.en, /next one about 2026-11-11 21:00/);
+  assert.match(status(gladys).message.fr, /prochaine vers 2026-11-11 21:00/);
+});
+
+test('a past day answered empty is asked again once a day, not every 30 minutes', async () => {
+  const { source, wait, app } = await setup({ start: false });
+  source.first = '2026-10-20';
+  await app.start();
+  await wait(0);
+  const firstDay = Date.parse('2026-10-20T00:00:00+02:00');
+  const old = () => source.requests.filter((r) => r.from < firstDay).length;
+  const initial = old();
+  assert.ok(initial >= 2, 'the days before the history asked once');
+  assert.ok(app.incomplete.has('2026-10-08'));
+  await wait(DAY - 10 * MINUTE);
+  assert.equal(old(), initial, 'not again within a day');
+  await wait(20 * MINUTE);
+  assert.ok(old() > initial, 'asked again after a day');
+});
+
+test('the days a pricing request lacks are capped at 62, asked in 9 windows at most', async () => {
+  const { app, source, wait } = await setup();
+  const days = [];
+  for (let k = 0; k < 93; k += 1) days.push(addDays('2026-08-31', -k));
+  app.want(days);
+  assert.equal(app.wanted.size, 62);
+  assert.equal([...app.wanted].sort()[0], addDays('2026-08-31', -61), 'the most recent kept');
+  const before = source.count();
+  await wait(2 * MINUTE);
+  const asked = source.requests.slice(before);
+  assert.ok(asked.length > 0 && asked.length <= 9, `${asked.length} requests`);
+  assert.equal(app.wanted.size, 0);
+});
+
 test('a retired API (410): said in the status, asked again every 6 hours only', async () => {
   let gone = false;
   const { source, wait, gladys } = await setup({
