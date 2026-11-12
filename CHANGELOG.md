@@ -29,8 +29,8 @@ the notes of the version's GitHub Release.
   status.
 - `THIRD_PARTY_NOTICES.md`, shipped in the image with `LICENSE`.
 - VAT input bounded to 0-25 %, and a half hour above 10 CHF/kWh (the Gladys
-  limit) refused with a reason; the status gives the real time of the next
-  attempt after a failure.
+  limit) refused with a reason, the current price too (none shown); the status
+  gives the real time of the next attempt after a failure.
 - The manifest declares `countries: ["CH"]` (Switzerland only), so it needs
   Gladys 5.3.0 or later.
 

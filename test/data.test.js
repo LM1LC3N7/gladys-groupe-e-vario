@@ -226,6 +226,22 @@ test('the pricing request is checked: start, energy, size', () => {
     () => intervalCosts(dear, maxed, [{ starts_at: t, kwh: 1 }]),
     /exceeds 10 CHF\/kWh/,
   );
+  // The current price follows the same limit: refused now, a next price over it not sent.
+  const now = dayStart(day) + 10 * 15 * MINUTE;
+  assert.throws(() => currentPrice(dear, maxed, now), /exceeds 10 CHF\/kWh/);
+  const edge = new Map([
+    [
+      day,
+      restoreDay(day, {
+        integrated: Array(96).fill(5),
+        grid: [...Array(11).fill(1), ...Array(85).fill(5)],
+      }),
+    ],
+  ]);
+  const near = currentPrice(edge, maxed, now);
+  close(near.price, (1 + 4) * 1.25);
+  assert.equal(near.next_price, null, 'a next price over the limit is not sent');
+  assert.equal(near.next_label, undefined);
   const fine = {
     template_key: 'groupe-e-vario-grid',
     inputs: { energy_chf_kwh: 2, supplement_chf_kwh: 2 },

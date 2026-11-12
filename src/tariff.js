@@ -154,15 +154,23 @@ export function intervalCosts(days, contract, intervals) {
  * The price now and the next one: `{ price, valid_until, next_price, label,
  * next_label }` (CHF/kWh, VAT included), `{ price: null }` when the current
  * quarter is unknown. The next price is the next quarter's (null when not
- * published yet).
+ * published yet, or over the core limit). A current price over the limit of
+ * 10 CHF/kWh is a PricingError (the handler answers `{ price: null }`).
  */
 export function currentPrice(days, contract, now) {
   const inputs = contractInputs(contract);
   const start = Math.floor(now / QUARTER_HOUR) * QUARTER_HOUR;
   const price = unitPrice(days, inputs, start);
   if (price === undefined) return { price: null };
+  // The same limit as the costs: over 10 CHF/kWh the core refuses the answer.
+  if (Math.abs(price) > MAX_COST_PER_KWH) {
+    throw new PricingError(
+      `The price of the contract exceeds ${MAX_COST_PER_KWH} CHF/kWh (the Gladys limit): check its inputs`,
+    );
+  }
   const next = start + QUARTER_HOUR;
-  const nextPrice = unitPrice(days, inputs, next);
+  let nextPrice = unitPrice(days, inputs, next);
+  if (nextPrice !== undefined && Math.abs(nextPrice) > MAX_COST_PER_KWH) nextPrice = undefined;
   return {
     price,
     valid_until: new Date(next).toISOString(),

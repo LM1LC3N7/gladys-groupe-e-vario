@@ -292,5 +292,17 @@
     "file": "src/app.js",
     "from": "    this.retryAt = this.dueAt(now);\n",
     "to": ""
+  },
+  {
+    "name": "tariff: current price over the core limit sent",
+    "file": "src/tariff.js",
+    "from": "if (Math.abs(price) > MAX_COST_PER_KWH) {",
+    "to": "if (false) {"
+  },
+  {
+    "name": "tariff: next price over the core limit sent",
+    "file": "src/tariff.js",
+    "from": "if (nextPrice !== undefined && Math.abs(nextPrice) > MAX_COST_PER_KWH) nextPrice = undefined;",
+    "to": ""
   }
 ]
