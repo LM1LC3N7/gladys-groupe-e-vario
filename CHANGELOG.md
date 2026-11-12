@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-12
+
 ### Added
 
 - Two delegated energy contracts, "Groupe E Vario (integrated price)" and
@@ -38,4 +40,5 @@ the notes of the version's GitHub Release.
 
 - The CI jobs stop after 30 minutes (`timeout-minutes`).
 
-[Unreleased]: https://github.com/LM1LC3N7/gladys-groupe-e-vario/commits/main
+[Unreleased]: https://github.com/LM1LC3N7/gladys-groupe-e-vario/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/LM1LC3N7/gladys-groupe-e-vario/releases/tag/v0.1.1

@@ -1,6 +1,6 @@
 {
   "name": "gladys-groupe-e-vario",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Groupe E Vario dynamic electricity tariff (Fribourg, Switzerland) per quarter hour as delegated energy contracts and tariff calendars for Gladys Assistant, from the public Groupe E tariff API. Unofficial.",
   "type": "module",
