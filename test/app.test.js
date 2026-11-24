@@ -48,7 +48,10 @@ test('first start: the last 35 days asked in 7-day windows, kept, fed to both ca
     assert.ok(r.init.signal, 'a timeout');
     assert.match(r.url, /^https:\/\/api\.tariffs\.groupe-e\.ch\/v2\/tariffs\?start_timestamp=/);
   }
-  assert.match(USER_AGENT, /^gladys-groupe-e-vario\/0\.1\.0 \(\+https:\/\/github\.com\/LM1LC3N7\//);
+  assert.match(
+    USER_AGENT,
+    /^gladys-groupe-e-vario\/\d+\.\d+\.\d+ \(\+https:\/\/github\.com\/LM1LC3N7\//,
+  );
   assert.equal(Object.keys(store.data.days).length, 35);
   assert.equal(store.data.days['2026-10-25'].integrated.length, 100, 'autumn change: 100 quarters');
   assert.ok(store.data.checkedAt >= NOW);
